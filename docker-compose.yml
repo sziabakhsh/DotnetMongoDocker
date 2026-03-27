@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  webapi:
+    build: .
+    container_name: mywebapi
+
+    # Map host port to container port
+    ports:
+      - "5000:8080"
+
+    environment:
+      # Set environment to Development (enables Swagger)
+      - ASPNETCORE_ENVIRONMENT=Development
+
+      # Configure ASP.NET to listen on port 8080 inside container
+      - ASPNETCORE_URLS=http://+:8080
+
+      # MongoDB connection string (service name = mongo)
+      - MONGO_CONNECTION_STRING=mongodb://mongo:27017
+
+    # Ensure MongoDB starts before Web API
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7.0
+    container_name: mongo
+
+    # Expose MongoDB port
+    ports:
+      - "27017:27017"
+
+    # Persist MongoDB data using a volume
+    volumes:
+      - mongo_data:/data/db
+
+# Named volume for MongoDB persistence
+volumes:
+  mongo_data:
